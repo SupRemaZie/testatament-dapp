@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 export default function OwnerDashboard() {
-  const { contract, account } = useWeb3();
+  const { contract, account, provider } = useWeb3(); // Ajout de provider pour signer les transactions
   const [testamentInfo, setTestamentInfo] = useState({
     heir: "",
     notary: "",
@@ -30,20 +30,29 @@ export default function OwnerDashboard() {
   const fetchTestamentInfo = async () => {
     try {
       setLoading(true);
-      const heir = await contract.heir();
-      const notary = await contract.notary();
-      const isDeceased = await contract.isDeceased();
-      const unlockTime = await contract.unlockTime();
 
-      setTestamentInfo({
-        heir,
-        notary,
-        isDeceased,
-        unlockTime: Number(unlockTime) * 1000, // Convert to milliseconds
-      });
+      if (!contract) {
+        throw new Error("Le contrat n'est pas encore chargé !");
+      }
+
+      const heir = await contract.heir?.();
+      const notary = await contract.notary?.();
+      const isDeceased = await contract.isDeceased?.();
+      const unlockTime = await contract.unlockTime?.();
+
+      if (heir && notary !== undefined && isDeceased !== undefined && unlockTime !== undefined) {
+        setTestamentInfo({
+          heir,
+          notary,
+          isDeceased,
+          unlockTime: Number(unlockTime) * 1000, // Convertir en millisecondes
+        });
+      } else {
+        throw new Error("Impossible de récupérer certaines informations du testament.");
+      }
     } catch (error) {
-      console.error("Error fetching testament info:", error);
-      toast.error("Failed to retrieve testament information.");
+      console.error("Erreur lors de la récupération des données :", error);
+      toast.error("Impossible de récupérer les informations du testament.");
     } finally {
       setLoading(false);
     }
@@ -52,36 +61,52 @@ export default function OwnerDashboard() {
   const updateHeir = async () => {
     try {
       if (!ethers.isAddress(newHeirAddress)) {
-        toast.error("Invalid heir address.");
+        toast.error("Adresse d'héritier invalide.");
         return;
       }
-      const tx = await contract.updateHeir(newHeirAddress);
-      toast.info("Transaction pending...");
+
+      if (!contract || !provider) {
+        throw new Error("Contrat ou provider non disponible !");
+      }
+
+      const signer = await provider.getSigner(); // Obtenir le signer
+      const contractWithSigner = contract.connect(signer); // Connecter le contrat au signer
+      const tx = await contractWithSigner.updateHeir(newHeirAddress);
+
+      toast.info("Transaction en cours...");
       await tx.wait();
-      toast.success("Heir updated successfully.");
+      toast.success("Héritier mis à jour avec succès.");
       setNewHeirAddress("");
       fetchTestamentInfo();
     } catch (error) {
-      console.error("Error updating heir:", error);
-      toast.error("Failed to update heir.");
+      console.error("Erreur lors de la mise à jour de l'héritier :", error);
+      toast.error("Échec de la mise à jour de l'héritier.");
     }
   };
 
   const updateNotary = async () => {
     try {
       if (!ethers.isAddress(newNotaryAddress)) {
-        toast.error("Invalid notary address.");
+        toast.error("Adresse du notaire invalide.");
         return;
       }
-      const tx = await contract.updateNotary(newNotaryAddress);
-      toast.info("Transaction pending...");
+
+      if (!contract || !provider) {
+        throw new Error("Contrat ou provider non disponible !");
+      }
+
+      const signer = await provider.getSigner();
+      const contractWithSigner = contract.connect(signer);
+      const tx = await contractWithSigner.updateNotary(newNotaryAddress);
+
+      toast.info("Transaction en cours...");
       await tx.wait();
-      toast.success("Notary updated successfully.");
+      toast.success("Notaire mis à jour avec succès.");
       setNewNotaryAddress("");
       fetchTestamentInfo();
     } catch (error) {
-      console.error("Error updating notary:", error);
-      toast.error("Failed to update notary.");
+      console.error("Erreur lors de la mise à jour du notaire :", error);
+      toast.error("Échec de la mise à jour du notaire.");
     }
   };
 
@@ -95,53 +120,51 @@ export default function OwnerDashboard() {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <p className="text-gray-600">Loading testament details...</p>
+            <p className="text-gray-600">Chargement des détails du testament...</p>
           ) : (
             <div className="space-y-4">
               <p>
-                <strong>Heir:</strong> {testamentInfo.heir}
+                <strong>Héritier :</strong> {testamentInfo.heir}
               </p>
               <p>
-                <strong>Notary:</strong> {testamentInfo.notary}
+                <strong>Notaire :</strong> {testamentInfo.notary}
               </p>
               <p>
-                <strong>Is Deceased:</strong> {testamentInfo.isDeceased
-                  ? "Yes"
-                  : "No"}
+                <strong>Décédé :</strong> {testamentInfo.isDeceased ? "Oui" : "Non"}
               </p>
               <p>
-                <strong>Unlock Time:</strong>{" "}
+                <strong>Date de déverrouillage :</strong>{" "}
                 {new Date(testamentInfo.unlockTime).toLocaleString()}
               </p>
 
-              {/* Update Heir Section */}
+              {/* Section Mise à Jour de l'Héritier */}
               <div className="mt-6">
-                <h3 className="text-lg font-semibold">Update Heir</h3>
+                <h3 className="text-lg font-semibold">Mise à jour de l'héritier</h3>
                 <div className="flex gap-2 mt-2">
                   <Input
                     type="text"
-                    placeholder="New Heir Address"
+                    placeholder="Nouvelle adresse de l'héritier"
                     value={newHeirAddress}
                     onChange={(e) => setNewHeirAddress(e.target.value)}
                   />
                   <Button onClick={updateHeir} className="bg-blue-600 hover:bg-blue-700">
-                    Update Heir
+                    Mettre à jour
                   </Button>
                 </div>
               </div>
 
-              {/* Update Notary Section */}
+              {/* Section Mise à Jour du Notaire */}
               <div className="mt-6">
-                <h3 className="text-lg font-semibold">Update Notary</h3>
+                <h3 className="text-lg font-semibold">Mise à jour du notaire</h3>
                 <div className="flex gap-2 mt-2">
                   <Input
                     type="text"
-                    placeholder="New Notary Address"
+                    placeholder="Nouvelle adresse du notaire"
                     value={newNotaryAddress}
                     onChange={(e) => setNewNotaryAddress(e.target.value)}
                   />
                   <Button onClick={updateNotary} className="bg-green-600 hover:bg-green-700">
-                    Update Notary
+                    Mettre à jour
                   </Button>
                 </div>
               </div>
