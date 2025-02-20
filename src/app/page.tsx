@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { Button} from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 export default function Home() {
   const [file, setFile] = useState<File>();
@@ -36,13 +38,49 @@ export default function Home() {
   };
 
   return (
-		<main className="w-full min-h-screen m-auto flex flex-col justify-center items-center">
-			<input type="file" onChange={handleChange} />
-			<button type="button" disabled={uploading} onClick={uploadFile}>
-				{uploading ? "Uploading..." : "Upload"}
-			</button>
-			{/* Add a conditional looking for the signed url and use it as the source */}
-			{url && <img src={url} alt="Image from Pinata" />}
-		</main>
-	);
+    <main className="w-full min-h-screen m-auto flex flex-col justify-center items-center space-y-6 p-4">
+      <h1 className="text-xl font-semibold text-center">Upload a file to IPFS</h1>
+      
+      {/* Input field */}
+      <Input
+        type="file"
+        onChange={handleChange}
+        className="w-full max-w-xs mb-4"
+      />
+
+      {/* Upload button */}
+      <Button
+        variant="primary"
+        disabled={uploading}
+        onClick={uploadFile}
+        className="w-full max-w-xs"
+      >
+        {uploading ? (
+          <>
+        
+            Uploading...
+          </>
+        ) : (
+          "Upload"
+        )}
+      </Button>
+
+      {/* Display the uploaded file URL */}
+      {url && (
+        <div className="w-full max-w-xs text-center">
+          <h2 className="text-lg font-semibold mb-2">Uploaded File</h2>
+          <img src={url} alt="Uploaded content from IPFS" className="max-w-full rounded-lg" />
+          <p className="mt-2 text-sm text-gray-500">View the file on IPFS</p>
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 underline"
+          >
+            Open in Pinata Gateway
+          </a>
+        </div>
+      )}
+    </main>
+  );
 }
