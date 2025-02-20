@@ -14,7 +14,7 @@ export const Web3Provider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const contractAddress = "0x123456789abcdef"; // Remplacez par l'adresse du contrat
+  const contractAddress = "0x17e91224c30c5b0B13ba2ef1E84FE880Cb902352"; // Remplacez par l'adresse du contrat
 
   const connectWallet = async () => {
     if (!window.ethereum) {
@@ -98,4 +98,10 @@ export const Web3Provider = ({ children }) => {
   }, [contract]);
 
   return (
-    <Web3Context.Provider value={{ account, connectWallet, role, contract, loading
+    <Web3Context.Provider value={{ account, connectWallet, role, contract, loading }}>
+      {children}
+    </Web3Context.Provider>
+  );
+};
+
+export const useWeb3 = () => useContext(Web3Context);
