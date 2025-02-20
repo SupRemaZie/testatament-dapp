@@ -2,36 +2,36 @@
 
 import { useWeb3 } from '@/Context/Web3Context';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 export default function ConnectWallet() {
   const { account, connectWallet, loading, role } = useWeb3();
   const router = useRouter();
-  const [isMetaMaskInstalled, setIsMetaMaskInstalled] = useState(false);
-
-  useEffect(() => {
-    if (typeof window !== "undefined" && window.ethereum) {
-      setIsMetaMaskInstalled(true);
-    }
-  }, []);
 
   useEffect(() => {
     if (account && role) {
-      router.replace(getRolePath(role));
+      redirectBasedOnRole();
     }
   }, [account, role]);
 
-  const handleConnect = async () => {
-    await connectWallet();
+  const redirectBasedOnRole = () => {
+    switch (role) {
+      case 'owner':
+        router.push('/dashboard');
+        break;
+      case 'heir':
+        router.push('/heir');
+        break;
+      case 'notary':
+        router.push('/notary');
+        break;
+      default:
+        router.push('/create');
+    }
   };
 
-  const getRolePath = (role) => {
-    switch (role) {
-      case 'owner': return '/dashboard';
-      case 'heir': return '/heir';
-      case 'notary': return '/notary';
-      default: return '/create';
-    }
+  const handleConnect = async () => {
+    await connectWallet();
   };
 
   const formatAddress = (addr) => {
@@ -56,15 +56,15 @@ export default function ConnectWallet() {
             Connecté: {formatAddress(account)}
           </p>
           <button
-            onClick={() => router.push(getRolePath(role))}
+            onClick={redirectBasedOnRole}
             className="px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
           >
             Accéder à mon espace
           </button>
         </div>
       )}
-
-      {!isMetaMaskInstalled && (
+      
+      {!window.ethereum && (
         <p className="mt-4 text-red-500">
           MetaMask n'est pas installé. Veuillez installer l'extension MetaMask pour continuer.
         </p>
