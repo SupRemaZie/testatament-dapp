@@ -50,14 +50,13 @@ export default function Home() {
 
       {/* Upload button */}
       <Button
-        variant="primary"
+        variant="default"
         disabled={uploading}
         onClick={uploadFile}
         className="w-full max-w-xs"
       >
         {uploading ? (
           <>
-        
             Uploading...
           </>
         ) : (
