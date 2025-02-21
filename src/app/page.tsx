@@ -1,12 +1,13 @@
 "use client"
 import { useState, useEffect, Suspense, lazy } from "react";
-import { Helmet } from "react-helmet";
+import { HelmetProvider, Helmet } from "react-helmet-async";
 
 const Testament = lazy(() => import("../components/Testament"));
 
 export default function App() {
   return (
     <div className="App">
+      <HelmetProvider>
       <Helmet>
         <title>Testament DApp</title>
         <meta name="description" content="Gérez votre testament sécurisé avec la blockchain" />
@@ -15,6 +16,7 @@ export default function App() {
       <Suspense fallback={<p>Chargement...</p>}>
         <Testament />
       </Suspense>
+      </HelmetProvider>
     </div>
   );
 }

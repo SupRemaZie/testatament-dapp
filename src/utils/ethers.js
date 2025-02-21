@@ -1,6 +1,6 @@
 import { ethers } from "ethers"; // Importation de ethers.js pour interagir avec la blockchain
 // Adresse du contrat déployé sur Sepolia
-const CONTRACT_ADDRESS = "";
+const CONTRACT_ADDRESS = "0x5b1869D9A4C187F2EAa108f3062412ecf0526b24";
 // Définition de l'ABI (Fonctions accessibles du contrat)
 const CONTRACT_ABI = [
  "function getDocumentHash() public view returns (string memory)",
