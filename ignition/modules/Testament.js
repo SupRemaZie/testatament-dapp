@@ -9,7 +9,7 @@ async function main() {
  heir.address,
  notary.address,
  "TestDocumentHash",
- 60
+ 20
  );
  await testament.waitForDeployment();
  console.log(`Testament deployed to: ${testament.target}`);

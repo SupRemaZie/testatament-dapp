@@ -67,4 +67,8 @@ _documentHash, uint _unlockDelay) {
     function updateNotary(address newNotary) public onlyOwner { 
         notary = newNotary; 
     } 
+        // fonction : Permet à l'héritier de consulter le hash du document sans débloquer le testament
+    function getDocumentHash() public view returns (string memory) {
+        return documentHash;
+    }
 }
