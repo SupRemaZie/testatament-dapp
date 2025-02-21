@@ -180,7 +180,7 @@ export async function unlockTestament() {
  console.log("[unlockTestament] Transaction confirmée, récupération du testament...");
  const docHash = await contract.getDocumentHash(); // Récupération du contenu du testament
  console.log("[unlockTestament] Testament récupéré :", docHash);
- alert(`☠️ Testament : ${docHash}`);
+ return docHash
  } catch (error) {
  console.error("[unlockTestament] Erreur déblocage :", error);
  alert("Erreur déblocage testament.");
