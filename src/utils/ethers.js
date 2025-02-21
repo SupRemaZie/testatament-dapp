@@ -1,6 +1,6 @@
 import { ethers } from "ethers"; // Importation de ethers.js pour interagir avec la blockchain
 // Adresse du contrat déployé sur Sepolia
-const CONTRACT_ADDRESS = "0x5b329bBe9b59b53eF2c06E1403178303b72280D8";
+const CONTRACT_ADDRESS = "";
 // Définition de l'ABI (Fonctions accessibles du contrat)
 const CONTRACT_ABI = [
  "function getDocumentHash() public view returns (string memory)",
@@ -202,3 +202,19 @@ export async function getUnlockTime() {
  return null;
  }
 }
+
+export async function setTestament(content) {
+    try {
+      const contract = await getContract();
+      if (!contract) return;
+      console.log("[setTestament] Enregistrement du testament...");
+      const tx = await contract.setTestament(content);
+      await tx.wait();
+      console.log("[setTestament] Testament enregistré avec succès !");
+      alert("Testament enregistré !");
+    } catch (error) {
+      console.error("[setTestament] Erreur enregistrement testament :", error);
+      alert("Erreur lors de l'enregistrement du testament.");
+    }
+  }
+  

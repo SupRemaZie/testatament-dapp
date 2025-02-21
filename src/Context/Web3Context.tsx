@@ -14,7 +14,7 @@ export const Web3Provider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const contractAddress = "0x47AFf4EbA9820a24E5A383B1bE3f226bEFAe148A"; // Remplacez par l'adresse du contrat
+  const contractAddress = "0xe78A0F7E598Cc8b0Bb87894B0F60dD2a88d6a8Ab"; // Remplacez par l'adresse du contrat
 
   const connectWallet = async () => {
     if (!window.ethereum) {
