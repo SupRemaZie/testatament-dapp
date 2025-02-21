@@ -1,14 +1,20 @@
-import { buildModule } from "@nomicfoundation/hardhat-ignition/modules";
-
-const TestamentModule = buildModule("TestamentModule", (m) => {
-  const heir = m.getParameter("heir", "0xHeirAddressHere");
-  const notary = m.getParameter("notary", "0xNotaryAddressHere");
-  const testamentHash = m.getParameter("testamentHash", "bafkreiclwfz6uzvturnq2zp2g2ovoxlur57pormqyw7555ybpd6rwhkrmi");
-  const unlockTime = m.getParameter("unlockTime", Math.floor(Date.now() / 1000) + 60); // 1minute
-
-  const testament = m.contract("Testament", [heir, notary, testamentHash, unlockTime]);
-
-  return { testament };
+const hre = require("hardhat");
+async function main() {
+ const [owner, notary, heir] = await hre.ethers.getSigners();
+ console.log(`Owner: ${owner.address}`);
+ console.log(`Notary: ${notary.address}`);
+ console.log(`Heir: ${heir.address}`);
+ const Testament = await hre.ethers.getContractFactory("Testament");
+ const testament = await Testament.deploy(
+ heir.address,
+ notary.address,
+ "TestDocumentHash",
+ 60
+ );
+ await testament.waitForDeployment();
+ console.log(`Testament deployed to: ${testament.target}`);
+}
+main().catch((error) => {
+ console.error(error);
+ process.exitCode = 1;
 });
-
-export default TestamentModule;
